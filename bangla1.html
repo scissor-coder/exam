@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 আবিদ: এসএসসি বাংলা মাস্টার কুইজ</title>
+    <meta name="author" content="Abid Al Jamee">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8faff;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+
+        .navbar {
+            position: sticky; top: 0; background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1rem; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .nav-content { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-title h1 { font-size: 1.25rem; color: var(--text-main); }
+        .nav-subtitle { font-size: 0.875rem; color: var(--primary-color); font-weight: 600; }
+        .timer-box {
+            background: #eef2ff; border: 1px solid #c7d2fe; color: var(--primary-color);
+            padding: 0.5rem 1rem; font-family: monospace;
+            font-size: 1.25rem; font-weight: bold; border-radius: 10px;
+        }
+        .timer-warning { color: var(--error-color); animation: pulse 1s infinite; }
+        @keyframes pulse { 50% { opacity: 0.5; } }
+
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .intro-card {
+            background: var(--card-bg); padding: 1.5rem; border-radius: 1rem;
+            border: 1px solid var(--border-color); text-align: center; margin-bottom: 2rem;
+        }
+
+        .question-card {
+            background: var(--card-bg); padding: 1.5rem; border-radius: 1rem;
+            border: 1px solid var(--border-color); margin-bottom: 1.5rem; transition: transform 0.2s;
+            /* PDF Page Break Fix */
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .q-header { display: flex; gap: 1rem; margin-bottom: 1.25rem; }
+        .q-num {
+            background: #f1f5f9; color: var(--primary-color); width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; font-weight: bold; flex-shrink: 0;
+        }
+        .options-grid { display: grid; gap: 0.75rem; }
+        .option-label {
+            display: flex; align-items: center; padding: 1rem; border: 1px solid var(--border-color);
+            border-radius: 0.75rem; cursor: pointer; transition: all 0.2s; background: #fafafa;
+        }
+        .option-label:hover { background: #f1f5f9; border-color: var(--primary-color); }
+        .option-label input { margin-right: 1rem; accent-color: var(--primary-color); }
+
+        .submit-btn {
+            width: 100%; padding: 1.25rem; background: var(--primary-color);
+            color: white; border: none; border-radius: 1rem; font-size: 1.125rem;
+            font-weight: bold; cursor: pointer; margin-top: 2rem; margin-bottom: 5rem;
+        }
+        .submit-btn:hover { background: var(--primary-hover); }
+
+        .correct-ans { background-color: #ecfdf5 !important; border-color: var(--success-color) !important; color: #065f46; }
+        .wrong-ans { background-color: #fef2f2 !important; border-color: var(--error-color) !important; color: #991b1b; }
+        
+        .feedback-box { margin-top: 1rem; padding: 1rem; border-radius: 0.75rem; display: none; }
+        .exp-box { background: #f8fafc; border-left: 4px solid var(--primary-color); padding: 0.75rem; margin-top: 0.5rem; font-size: 0.9rem; }
+
+        .modal {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+        }
+        .modal-content { background: white; padding: 2rem; border-radius: 1.5rem; width: 90%; max-width: 400px; text-align: center; }
+        .score-circle {
+            width: 100px; height: 100px; border: 5px solid var(--primary-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem; font-size: 1.5rem; font-weight: bold; color: var(--primary-color);
+        }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1.5rem; }
+        .btn-secondary { background: #e2e8f0; color: #475569; padding: 0.75rem; border-radius: 0.75rem; border: none; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: var(--primary-color); color: white; padding: 0.75rem; border-radius: 0.75rem; border: none; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="pdf-content">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-title">
+                    <h1>এসএসসি বাংলা বোর্ড স্পেশাল</h1>
+                    <div class="nav-subtitle">📚 টপ ৭০ এমসিকিউ (🎯 আবিদ)</div>
+                </div>
+                <div id="timer" class="timer-box">25:00</div>
+            </div>
+        </nav>
+
+        <main class="container">
+            <div class="intro-card">
+                <h2>নির্দেশনা</h2>
+                <p>সবচেয়ে গুরুত্বপূর্ণ ৭০টি প্রশ্ন। সময় ২৫ মিনিট। প্রতিটি প্রশ্নের সঠিক ব্যাখ্যা পরীক্ষা শেষে দেখা যাবে।</p>
+            </div>
+
+            <form id="quiz-form">
+                <div id="questions-container"></div>
+                <button type="submit" id="submit-btn" class="submit-btn">পরীক্ষা শেষ করুন</button>
+            </form>
+        </main>
+    </div>
+
+    <div id="result-modal" class="modal">
+        <div class="modal-content">
+            <div class="score-circle" id="score-display">0/70</div>
+            <h2 id="result-title">ফলাফল</h2>
+            <p id="performance-msg" style="color: var(--text-muted); margin-top: 0.5rem;"></p>
+            <div class="btn-group">
+                <button onclick="closeModal()" class="btn-secondary">রিভিউ</button>
+                <button onclick="downloadResults(this)" class="btn-primary">PDF ডাউনলোড</button>
+            </div>
+            <button onclick="location.reload()" style="width:100%; margin-top:0.75rem; background:none; border:1px solid var(--primary-color); color:var(--primary-color); padding:0.75rem; border-radius:0.75rem; cursor:pointer; font-weight: bold;">আবার চেষ্টা করুন</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: 'বাংলা বর্ণমালায় মাত্রাহীন বর্ণ কয়টি?', options: ["৮টি", "১০টি", "১১টি", "৩৯টি"], ans: 1, exp: "মাত্রাহীন ১০টি: এ, ঐ, ও, ঔ, ঙ, ঞ, ৎ, ং, ঃ, ঁ।" },
+            { q: '"কপোতাক্ষ নদ" কবিতায় কবির কী প্রকাশ পেয়েছে?', options: ["প্রকৃতি প্রেম", "স্মৃতিকাতরতা", "বিদ্রোহ", "দুঃখবোধ"], ans: 1, exp: "প্রবাস জীবনে জন্মভূমির জন্য কবির স্মৃতিকাতরতা ফুটে উঠেছে।" },
+            { q: 'সমাস ভাষাকে কী করে?', options: ["সম্প্রসারিত করে", "সংক্ষেপ করে", "বিশ্লেষণ করে", "অর্থহীন করে"], ans: 1, exp: "সমাস শব্দের অর্থ সংক্ষেপণ।" },
+            { q: '"আম আঁটির ভেঁপু" গল্পটি কোন উপন্যাসের অংশ?', options: ["অপরাজিত", "ইছামতী", "পথের পাঁচালী", "আরণ্যক"], ans: 2, exp: "পথের পাঁচালী উপন্যাসের অংশ।" },
+            { q: '"অক্ষির সমীপে" - এক কথায় প্রকাশ কোনটি?', options: ["প্রত্যক্ষ", "সমক্ষ", "পরোক্ষ", "নিরপেক্ষ"], ans: 1, exp: "অক্ষির সমীপে = সমক্ষ।" },
+            { q: '"গায়ক" শব্দের সঠিক সন্ধি বিচ্ছেদ কোনটি?', options: ["গা + য়ক", "গৈ + অক", "গো + অক", "গৈ + যক"], ans: 1, exp: "গৈ + অক = গায়ক।" },
+            { q: '"পল্লীজননী" কবিতায় রাতের পরিবেশ কেমন ছিল?', options: ["কোলাহলপূর্ণ", "আলোকিত", "থমথমে ও নিস্তব্ধ", "ভয়ংকর"], ans: 2, exp: "নিঝুম রাতের চিত্র ফুটে উঠেছে।" },
+            { q: '"উভয় সংকট" অর্থ প্রকাশ করে কোন বাগধারাটি?', options: ["আকাশ ভেঙে পড়া", "করাতের দাঁত", "শাঁখের করাত", "কুল কাঠের আগুন"], ans: 2, exp: "শাঁখের করাত মানে উভয় সংকট।" },
+            { q: '"নিমগাছ" গল্পের রচয়িতার প্রকৃত নাম কী?', options: ["প্রমথ চৌধুরী", "বলাইচাঁদ মুখোপাধ্যায়", "সৈয়দ মুজতবা আলী", "শরৎচন্দ্র চট্টোপাধ্যায়"], ans: 1, exp: "বলাইচাঁদ মুখোপাধ্যায় (বনফুল)।" },
+            { q: 'কোন সমাসে উভয় পদের অর্থের প্রাধান্য থাকে?', options: ["দ্বিগু", "কর্মধারয়", "দ্বন্দ্ব", "তৎপুরুষ"], ans: 2, exp: "দ্বন্দ্ব সমাসে দুই পদের অর্থই প্রধান।" },
+            { q: '"সূর্য" শব্দের সমার্থক শব্দ কোনটি?', options: ["শশাঙ্ক", "অর্ক", "পাবক", "হিল্লোল"], ans: 1, exp: "অর্ক মানে সূর্য।" },
+            { q: '"মানুষ মুহাম্মদ (স.)" প্রবন্ধটি কোন গ্রন্থ থেকে নেওয়া হয়েছে?', options: ["মরুভাস্কর", "নবী কাহিনী", "বিশ্বনবী", "সিরাতে রাসুল"], ans: 0, exp: "মরুভাস্কর গ্রন্থ থেকে সংকলিত।" },
+            { q: '"যা পূর্বে কখনো দেখা যায়নি" - এক কথায় কী হবে?', options: ["অদৃষ্টপূর্ব", "অভূতপূর্ব", "অপূর্ব", "অশ্রুতপূর্ব"], ans: 0, exp: "অদৃষ্টপূর্ব।" },
+            { q: 'বচন অর্থ কী?', options: ["সংখ্যার ধারণা", "গণনার ধারণা", "ক্রমের ধারণা", "পরিমাণের ধারণা"], ans: 0, exp: "ব্যাকরণে বচন মানে সংখ্যার ধারণা।" },
+            { q: '"মাধুর্য" শব্দের প্রকৃতি ও প্রত্যয় কোনটি?', options: ["মধু + র্য", "মধুর + য", "মাধুর + য", "মাধু + র্য"], ans: 1, exp: "মধুর + য = মাধুর্য।" },
+            { q: '"পকেটমার" কোন সমাসের উদাহরণ?', options: ["উপপদ তৎপুরুষ", "অব্যয়ীভাব", "বহুব্রীহি", "কর্মধারয়"], ans: 0, exp: "পকেট মারে যে = পকেটমার।" },
+            { q: '"স্বাধীনতা, এই শব্দটি কীভাবে আমাদের হলো" কবিতার কবি কে?', options: ["শামসুর রাহমান", "সৈয়দ শামসুল হক", "নির্মলেন্দু গুণ", "হেলাল হাফিজ"], ans: 2, exp: "নির্মলেন্দু গুণ।" },
+            { q: '"অপরিচিতা" গল্পে অনুপমের বয়স কত ছিল?', options: ["পঁচিশ", "সাতাশ", "ছাব্বিশ", "আটাশ"], ans: 1, exp: "অনুপমের বয়স ছিল সাতাশ।" },
+            { q: 'বাংলা ভাষার মূল উৎস কী?', options: ["প্রাকৃত ভাষা", "ইন্দো-ইউরোপীয় ভাষা", "সংস্কৃত ভাষা", "পালি ভাষা"], ans: 1, exp: "ইন্দো-ইউরোপীয় মূল ভাষা।" },
+            { q: '"হাতেখড়ি" দেওয়া হয় যে অনুষ্ঠানে - এটি কোন সমাস?', options: ["মধ্যপদলোপী কর্মধারয়", "বহুব্রীহি", "ব্যতিহার বহুব্রীহি", "অলুক দ্বন্দ্ব"], ans: 1, exp: "বহুব্রীহি সমাস।" },
+            { q: 'মমতাদির বেতন কত টাকা ঠিক হয়েছিল?', options: ["১২ টাকা", "১৫ টাকা", "১৮ টাকা", "২০ টাকা"], ans: 1, exp: "মমতাদির বেতন ১৫ টাকা ঠিক হয়েছিল।" },
+            { q: 'নিমগাছটির কোন অংশটি কাভিরাজরা চিকিৎসার কাজে ব্যবহার করে না?', options: ["ছাল", "পাতা", "শিকড়", "ফল"], ans: 3, exp: "ফল সাধারণত চিকিৎসার প্রধান অনুষঙ্গ নয়।" },
+            { q: 'কোনটি প্রমথ চৌধুরীর ছদ্মনাম?', options: ["বনফুল", "বীরবল", "ভানুসিংহ", "টেকচাঁদ"], ans: 1, exp: "প্রমথ চৌধুরীর ছদ্মনাম বীরবল।" },
+            { q: '"রানার" কবিতাটি কোন কাব্যের অন্তর্গত?', options: ["ছাড়পত্র", "ঘুম নেই", "পূর্বাভাস", "মিঠে কড়া"], ans: 0, exp: "সুকান্ত ভট্টাচার্যের ছাড়পত্র কাব্যের।" },
+            { q: 'উপসর্গ কয় প্রকার?', options: ["২ প্রকার", "৩ প্রকার", "৪ প্রকার", "৫ প্রকার"], ans: 1, exp: "উপসর্গ ৩ প্রকার: খাঁটি বাংলা, তৎসম ও বিদেশি।" },
+            { q: '"নদী" শব্দের সমার্থক শব্দ কোনটি?', options: ["তটিনী", "মেদিনী", "ধরিত্রী", "পাবক"], ans: 0, exp: "তটিনী মানে নদী।" },
+            { q: 'সনেটের শেষে কয়টি পঙক্তি থাকে?', options: ["৮টি", "৬টি", "৪টি", "২টি"], ans: 1, exp: "সনেটের অষ্টক (৮) ও ষটক (৬) অংশ থাকে।" },
+            { q: '"শকুন্তলা" কার লেখা?', options: ["বঙ্কিমচন্দ্র", "বিদ্যাসাগর", "রবীন্দ্রনাথ", "শরৎচন্দ্র"], ans: 1, exp: "ঈশ্বরচন্দ্র বিদ্যাসাগর।" },
+            { q: 'নিমরাজি - এখানে "নিম" কোন ভাষার উপসর্গ?', options: ["বাংলা", "ফারসি", "আরবি", "তৎসম"], ans: 1, exp: "নিম একটি ফারসি উপসর্গ।" },
+            { q: '"সুভা" গল্পে প্রতাপের প্রধান শখ কী ছিল?', options: ["মাছ ধরা", "ঘুড়ি ওড়ানো", "গান গাওয়া", "বই পড়া"], ans: 0, exp: "প্রতাপের প্রধান শখ ছিল ছিপ ফেলে মাছ ধরা।" },
+            { q: 'বিসর্গ সন্ধি কয় প্রকার?', options: ["২ প্রকার", "৩ প্রকার", "৪ প্রকার", "৫ প্রকার"], ans: 0, exp: "বিসর্গ সন্ধি ২ প্রকার।" },
+            { q: 'বাংলায় বিভক্তিহীন পদকে কী বলা হয়?', options: ["শূন্য বিভক্তি", "অ বিভক্তি", "প্রথমা বিভক্তি", "সবকটি"], ans: 3, exp: "বিভক্তিহীন বা প্রথমা বিভক্তিকে শূন্য বিভক্তি বলা হয়।" },
+            { q: '"পয়লা বৈশাখ" প্রবন্ধের লেখক কে?', options: ["শামসুজ্জামান খান", "কবীর চৌধুরী", "মোতাহের হোসেন", "আবুল ফজল"], ans: 1, exp: "কবীর চৌধুরী।" },
+            { q: 'মানুষ কবিতায় কবি কিসের জয়গান গেয়েছেন?', options: ["শক্তির", "ভক্তির", "মানবতার", "ধর্মের"], ans: 2, exp: "নজরুল মানবতার জয়গান গেয়েছেন।" },
+            { q: 'বিভক্তি কত প্রকার?', options: ["৫ প্রকার", "৭ প্রকার", "৯ প্রকার", "১০ প্রকার"], ans: 1, exp: "শব্দ বিভক্তি ৭ প্রকার।" },
+            { q: '"তাসের ঘর" বাগধারাটির অর্থ কী?', options: ["ক্ষণস্থায়ী", "দীর্ঘস্থায়ী", "অসম্ভব বস্তু", "বিপজ্জনক"], ans: 0, exp: "তাসের ঘর মানে ক্ষণস্থায়ী।" },
+            { q: 'ধাতু কয় প্রকার?', options: ["২ প্রকার", "৩ প্রকার", "৪ প্রকার", "৫ প্রকার"], ans: 1, exp: "ধাতু ৩ প্রকার।" },
+            { q: '"জীবন-সঙ্গীত" কোন কবিতার অনুবাদ?', options: ["Psalm of Life", "Song of Life", "Nature", "Victory"], ans: 0, exp: "Henry Wadsworth Longfellow-এর A Psalm of Life।" },
+            { q: 'সন্ধি ব্যাকরণের কোন অংশে আলোচিত হয়?', options: ["ধ্বনিতত্ত্ব", "রূপতত্ত্ব", "বাক্যতত্ত্ব", "অর্থতত্ত্ব"], ans: 0, exp: "সন্ধি ধ্বনির মিলন, তাই ধ্বনিতত্ত্বে আলোচিত হয়।" },
+            { q: '"লালসালু" উপন্যাসের মূল চরিত্র কে?', options: ["মজিদ", "খালেক ব্যাপারী", "আক্কাস", "রতিম"], ans: 0, exp: "মজিদ।" },
+            { q: 'বচন শুধু কোন পদের হয়?', options: ["বিশেষ্য ও সর্বনাম", "বিশেষণ", "অব্যয়", "ক্রিয়া"], ans: 0, exp: "বচন কেবল বিশেষ্য ও সর্বনামের হয়।" },
+            { q: '৭ই মার্চের ভাষণকে ইউনেস্কো কী স্বীকৃতি দিয়েছে?', options: ["বিশ্ব ঐতিহ্য", "মেমোরি অব দ্য ওয়ার্ল্ড", "শান্তি পদক", "সেরা ভাষণ"], ans: 1, exp: "Memory of the World Register." },
+            { q: 'তদ্ভব শব্দের অর্থ কী?', options: ["সংস্কৃত হতে জাত", "বাংলা হতে জাত", "বিদেশি", "প্রাকৃত"], ans: 0, exp: "তদ্ভব মানে তা হতে (সংস্কৃত হতে) উৎপন্ন।" },
+            { q: 'লিঙ্গান্তরের ক্ষেত্রে কোনটি সঠিক?', options: ["অরণ্য-অরণ্যানী", "মালি-মালিনী", "জেলে-জেলেপাবনী", "সবগুলো"], ans: 3, exp: "সবগুলোই লিঙ্গান্তরের সঠিক রূপ।" },
+            { q: 'নিচের কোনটি মিশ্র শব্দ?', options: ["হাট-বাজার", "লুঙ্গি", "টেবিল", "ফুল"], ans: 0, exp: "হাট (বাংলা) + বাজার (ফারসি) = হাট-বাজার।" },
+            { q: 'ব্যাকরণ শব্দের ব্যুৎপত্তিগত অর্থ কী?', options: ["বিশ্লেষণ করা", "বিশেষভাবে বিশ্লেষণ", "সংক্ষেপণ", "সম্প্রসারণ"], ans: 1, exp: "বি + আ + কৃ + অন = বিশেষভাবে বিশ্লেষণ।" },
+            { q: '"রবীন্দ্র" শব্দের সঠিক সন্ধি বিচ্ছেদ কোনটি?', options: ["রবি + ইন্দ্র", "রবী + ইন্দ্র", "রবি + ঈন্দ্র", "রবী + ঈন্দ্র"], ans: 0, exp: "রবি + ইন্দ্র (ই + ই = ঈ)।" },
+            { q: 'অনুসর্গের অপর নাম কী?', options: ["উপসর্গ", "কর্মপ্রবচনীয়", "বিভক্তি", "প্রত্যয়"], ans: 1, exp: "অনুসর্গকে কর্মপ্রবচনীয় বলা হয়।" },
+            { q: 'সারাংশ লিখলে কোনটি বর্জন করতে হয়?', options: ["উদাহরণ", "অলংকার", "উপমা", "সবগুলো"], ans: 3, exp: "সারাংশে অপ্রয়োজনীয় বর্ণনা ও অলংকার বর্জনীয়।" },
+            { q: 'শুদ্ধ বানান কোনটি?', options: ["মুমূর্ষু", "মুমুর্যূ", "মুমুর্ষু", "মুমূর্ষূ"], ans: 0, exp: "হ্রস্ব উ, দীর্ঘ ঊ, হ্রস্ব উ (মুমূর্ষু)।" },
+            { q: 'ক্রিয়াপদের মূল অংশকে কী বলে?', options: ["বিভক্তি", "ধাতু", "প্রকৃতি", "উপসর্গ"], ans: 1, exp: "ধাতু।" },
+            { q: 'অব্যয়ীভাব সমাসে কোন পদের অর্থ প্রধান?', options: ["পূর্বপদ", "পরপদ", "উভয় পদ", "ভিন্ন পদ"], ans: 0, exp: "অব্যয়ীভাবে পূর্বপদের অর্থ প্রধান।" },
+            { q: '"উপেক্ষিত শক্তির উদ্বোধন" প্রবন্ধে নজরুল কিসের জয়গান গেয়েছেন?', options: ["ছোটলোক সম্প্রদায়", "ধনী শ্রেণী", "বিপ্লবী", "কৃষক"], ans: 0, exp: "সমাজের অবহেলিত মানুষের।" },
+            { q: '"বঙ্গবাণী" কবিতার কবি কে?', options: ["আবদুল হাকিম", "নজরুল", "জীবনানন্দ", "সুকান্ত"], ans: 0, exp: "মধ্যযুগের কবি আবদুল হাকিম।" },
+            { q: 'বাংলা ভাষারীতির কয়টি রূপ?', options: ["২টি", "৩টি", "৪টি", "৫টি"], ans: 0, exp: "কথ্য ও লেখ্য।" },
+            { q: 'পদ্মা নদীর মাঝি কার লেখা?', options: ["মানিক বন্দ্যোপাধ্যায়", "বিভূতিভূষণ", "তারাশঙ্কর", "শরৎচন্দ্র"], ans: 0, exp: "মানিক বন্দ্যোপাধ্যায়।" },
+            { q: 'বাক্যের ক্ষুদ্রতম একক কোনটি?', options: ["বর্ণ", "শব্দ", "ধ্বনি", "উপসর্গ"], ans: 1, exp: "বাক্যের ক্ষুদ্রতম একক শব্দ।" },
+            { q: 'কারক কত প্রকার?', options: ["৪", "৫", "৬", "৭"], ans: 2, exp: "কারক ৬ প্রকার।" },
+            { q: 'উপমেয় ও উপমানের মধ্যে অভেদ কল্পনা করা হলে কোন সমাস হয়?', options: ["উপমিত", "রূপক", "উপমান", "দ্বিগু"], ans: 1, exp: "রূপক কর্মধারয়।" },
+            { q: '"একাত্তরের দিনগুলি" কোন ধরনের রচনা?', options: ["উপন্যাস", "দিনপঞ্জি", "নাটক", "স্মৃতিচারণ"], ans: 1, exp: "জাহানারা ইমামের ডায়েরি বা দিনপঞ্জি।" },
+            { q: 'সম্বোধন পদে কোন চিহ্ন বসে?', options: ["দাড়ি", "কমা", "কোলন", "সেমিকোলন"], ans: 1, exp: "সম্বোধনের পর কমা বসে।" },
+            { q: 'চাষার দুখু প্রবন্ধের লেখিকা কে?', options: ["রোকেয়া সাখাওয়াত হোসেন", "সুফিয়া কামাল", "সেলিনা হোসেন", "জাহানারা ইমাম"], ans: 0, exp: "বেগম রোকেয়া।" },
+            { q: 'শুদ্ধ বাক্য কোনটি?', options: ["সব মানুষরা মরণশীল", "সকল মানুষ মরণশীল", "সব মানুষগণ মরণশীল", "সকল মানুষরা মরণশীল"], ans: 1, exp: "দ্বিবচন দোষমুক্ত বাক্য হলো 'সকল মানুষ মরণশীল'।" },
+            { q: 'কোনটি অগ্নির সমার্থক শব্দ নয়?', options: ["অনল", "পাবক", "জলধি", "বহ্নি"], ans: 2, exp: "জলধি মানে সমুদ্র।" },
+            { q: 'উপপদ তৎপুরুষের উদাহরণ কোনটি?', options: ["পকেটমার", "ছেলেধরা", "মাছিমারা", "সবগুলো"], ans: 3, exp: "সবগুলোই উপপদ তৎপুরুষ।" },
+            { q: 'ক্রিয়া পদের সাথে সম্বন্ধহীন পদ কোনটি?', options: ["সম্বন্ধ পদ", "অব্যয় পদ", "বিশেষণ", "সর্বনাম"], ans: 0, exp: "সম্বন্ধ পদ কারক নয় কারণ ক্রিয়ার সাথে এর সম্পর্ক সরাসরি নয়।" },
+            { q: '"সুশিক্ষিত লোক মাত্রই স্বশিক্ষিত" - উক্তিটি কার?', options: ["রবীন্দ্রনাথ", "প্রমথ চৌধুরী", "নজরুল", "বিদ্যাসাগর"], ans: 1, exp: "বই পড়া প্রবন্ধের উক্তি।" },
+            { q: 'ষত্ব বিধান কোন শব্দে খাটে?', options: ["তৎসম", "দেশি", "বিদেশি", "সবগুলোতে"], ans: 0, exp: "কেবল তৎসম শব্দে।" },
+            { q: 'বই পড়া প্রবন্ধে লাইব্রেরিকে কিসের সাথে তুলনা করা হয়েছে?', options: ["হাসপাতাল", "বিদ্যালয়", "ক্লাব", "অফিস"], ans: 0, exp: "লাইব্রেরিকে হাসপাতালের উপরে স্থান দেওয়া হয়েছে।" },
+            { q: '"নদী ও নারী" উপন্যাসের লেখক কে?', options: ["হুমায়ুন কবির", "জহির রায়হান", "শওকত ওসমান", "সৈয়দ ওয়ালীউল্লাহ"], ans: 0, exp: "হুমায়ুন কবির।" }
+        ];
+
+        let timeLeft = 25 * 60;
+        const renderQuestions = () => {
+            const container = document.getElementById('questions-container');
+            questions.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = "question-card";
+                card.id = `q-${idx}`;
+                card.innerHTML = `
+                    <div class="q-header">
+                        <span class="q-num">${idx + 1}</span>
+                        <div>${item.q}</div>
+                    </div>
+                    <div class="options-grid">
+                        ${item.options.map((opt, i) => `
+                            <label class="option-label" data-q="${idx}" data-opt="${i}">
+                                <input type="radio" name="q${idx}" value="${i}">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-${idx}" class="feedback-box">
+                        <p class="status-text"></p>
+                        <div class="exp-box"><strong>💡 ব্যাখ্যা:</strong> ${item.exp}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        const timerInterval = setInterval(() => {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            const el = document.getElementById('timer');
+            el.textContent = `${mins}:${secs < 10 ? '0'+secs : secs}`;
+            if (timeLeft <= 300) el.classList.add('timer-warning');
+            if (timeLeft <= 0) { clearInterval(timerInterval); submitQuiz(); }
+            timeLeft--;
+        }, 1000);
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+            let score = 0;
+            const form = new FormData(document.getElementById('quiz-form'));
+            
+            questions.forEach((q, idx) => {
+                const selected = form.get(`q${idx}`);
+                const feedback = document.getElementById(`feedback-${idx}`);
+                const status = feedback.querySelector('.status-text');
+                const labels = document.querySelectorAll(`label[data-q="${idx}"]`);
+
+                labels.forEach((label, i) => {
+                    if (i === q.ans) label.classList.add('correct-ans');
+                    if (selected !== null && parseInt(selected) === i && i !== q.ans) label.classList.add('wrong-ans');
+                    label.style.pointerEvents = 'none';
+                });
+
+                feedback.style.display = 'block';
+                if (selected !== null && parseInt(selected) === q.ans) {
+                    score++;
+                    status.innerHTML = "✅ সঠিক হয়েছে!";
+                    status.style.color = "var(--success-color)";
+                } else {
+                    status.innerHTML = "❌ ভুল হয়েছে!";
+                    status.style.color = "var(--error-color)";
+                }
+            });
+
+            document.getElementById('score-display').textContent = `${score}/70`;
+            
+            let perfMsg = "";
+            let percentage = (score / 70) * 100;
+            if (percentage >= 80) perfMsg = "অসাধারণ প্রস্তুতি!";
+            else if (percentage >= 60) perfMsg = "ভালো প্রস্তুতি, তবে আরো চর্চা প্রয়োজন।";
+            else perfMsg = "প্রস্তুতি সন্তোষজনক নয়।";
+            document.getElementById('performance-msg').textContent = perfMsg;
+
+            document.getElementById('result-modal').style.display = 'flex';
+        }
+
+        function closeModal() { 
+            document.getElementById('result-modal').style.display = 'none'; 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function downloadResults(btnElement) {
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "PDF তৈরি হচ্ছে...";
+            
+            // মডালটি লুকিয়ে ফেলছি যেন এটি পিডিএফ-এর ভেতরে না আসে
+            document.getElementById('result-modal').style.display = 'none';
+
+            const element = document.getElementById('pdf-content');
+            
+            // .set(opt) মেথড ব্যবহার করে কনফিগারেশন যুক্ত করা হলো
+            const opt = { 
+                margin: [10, 10, 10, 10], 
+                filename: 'SSC_Bangla_Quiz_Abid.pdf', 
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btnElement.innerText = originalText;
+                // পিডিএফ জেনারেট হওয়ার পর স্ক্রিনের উপরে নিয়ে যাওয়া হবে
+                window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            });
+        }
+
+        window.onload = renderQuestions;
+        document.getElementById('quiz-form').addEventListener('submit', e => { e.preventDefault(); submitQuiz(); });
+    </script>
+</body>
+</html>
